@@ -1,9 +1,28 @@
 <h2>Lista de categorias</h2>
 <hr />
-<div class="card">
-  <div class="card-body">
-    <a href="/admin/categorias/add-ategorias">
-      <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Nova categoria</button>
-    </a>
+{{! Cria o botão para adicionar uma nova categoria }}
+<a href="/admin/categorias/addcategorias">
+  <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Nova categoria</button>
+</a>
+<hr />
+
+{{! Cria a lista separando por cards na pagina de categorias }}
+{{#each categorias}}
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h4>{{nome}}</h4>
+      <small>Slug: {{slug}}</small>
+      <br />
+      <small>Data do cadastro: {{date}}</small>
+      <hr />
+      {{! Botão para editar a categoria }}
+      <a href="/admin/categorias/edit/{{_id}}">
+        <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Editar categoria</button>
+      </a>
+    </div>
   </div>
-</div>
+
+{{else}}
+
+{{/each}}

@@ -7,12 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Node JS</title>
 </head>
+
 <body>
-    
+
+    {{!-- Carrega a navbars na pagina --}}
     {{>_navbar}}
 
     <div class="container mt-3">
+        
+        {{!-- Carrega a mensagem de erro --}}
+         {{>_msg}}
 
+         {{!-- Carrega o body na pagina --}}
         {{{body}}}
 
     </div>
