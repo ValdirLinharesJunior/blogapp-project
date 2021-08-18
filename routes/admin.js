@@ -27,8 +27,8 @@ router.get("/categorias", (req, res) => {
 });
 
 //Rota add-categorias
-router.get("/categorias/addcategorias", (req, res) => {
-  res.render("admin/addcategorias");
+router.get("/categorias/addcategoria", (req, res) => {
+  res.render("admin/addcategoria");
 });
 
 //Rota nova categoria (salva no banco)
@@ -49,7 +49,7 @@ router.post("/categorias/nova", (req, res) => {
   }
 
   if (erros.length > 0) {
-    res.render("admin/addcategorias", { erros: erros });
+    res.render("admin/addcategoria", { erros: erros });
   } else {
     //Captura os dados vindos do form e salva no banco
     const novaCategoria = {
@@ -71,7 +71,7 @@ router.post("/categorias/nova", (req, res) => {
   }
 });
 
-//Rota de edição de categorias
+//Rota de edição de categorias (busca os dados da categoria que será editada)
 router.get("/categorias/edit/:id", (req, res) => {
   Categoria.findOne({ _id: req.params.id })
     .lean()
@@ -106,6 +106,37 @@ router.post("/categorias/edit", (req, res) => {
     .catch((err) => {
       req.flash("error_msg", "Houve um erro ao editar a categoria");
       res.redirect("/admin/categorias");
+    });
+});
+
+//Deletar uma categoria
+router.post("/categorias/deletar", (req, res) => {
+  Categoria.remove({ _id: req.body.id })
+    .then(() => {
+      req.flash("success_msg", "Categoria deletada com sucesso!");
+      res.redirect("/admin/categorias");
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Erro ao deletar a categoria...");
+      res.redirect("/admin/categorias");
+    });
+});
+
+//Rota para renderizar as postagens
+router.get("/postagens", (req, res) => {
+  res.render("admin/postagens");
+});
+
+//Rota de adição de postagens
+router.get("/postagens/addpostagem", (req, res) => {
+  Categoria.find()
+    .lean()
+    .then((categorias) => {
+      res.render("admin/addpostagem", { categorias: categorias });
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Erro ao carregar o formulário...");
+      res.redirect("/admin");
     });
 });
 

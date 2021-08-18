@@ -1,14 +1,13 @@
 <h2>Lista de categorias</h2>
 <hr />
 {{! Cria o botão para adicionar uma nova categoria }}
-<a href="/admin/categorias/addcategorias">
+<a href="/admin/categorias/addcategoria">
   <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Nova categoria</button>
 </a>
 <hr />
 
 {{! Cria a lista separando por cards na pagina de categorias }}
 {{#each categorias}}
-
   <div class="card mb-3">
     <div class="card-body">
       <h4>{{nome}}</h4>
@@ -16,13 +15,19 @@
       <br />
       <small>Data do cadastro: {{date}}</small>
       <hr />
-      {{! Botão para editar a categoria }}
-      <a href="/admin/categorias/edit/{{_id}}">
-        <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Editar categoria</button>
-      </a>
+      <div class="row pl-3">
+        {{! Botão para editar a categoria }}
+        <a href="/admin/categorias/edit/{{_id}}">
+          <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Editar categoria</button>
+        </a>
+        {{! Botão para deletar a categoria }}
+        <form class="ml-3" action="/admin/categorias/deletar" method="POST">
+          <input type="hidden" name="id" value="{{_id}}" />
+          <button type="submit" class="btn" style="background-color: #005293; color: #ffffff;">Deletar categoria</button>
+        </form>
+      </div>
     </div>
   </div>
-
 {{else}}
-
+  <h5>Nenhuma categoria cadastrada...</h5>
 {{/each}}
