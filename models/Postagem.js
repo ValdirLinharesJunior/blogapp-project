@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 //Cria uma tabela de postagem
 const Postagem = new Schema({
-  Titulo: {
+  titulo: {
     type: String,
     required: true,
   },
@@ -24,8 +24,8 @@ const Postagem = new Schema({
     required: true,
   },
 
-  categorias: {
-    Type: Schema.Types.ObjectId,
+  categoria: {
+    type: Schema.Types.ObjectId,
     ref: "categorias",
     required: true,
   },

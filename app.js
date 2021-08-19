@@ -35,6 +35,7 @@ app.set("view engine", "handlebars");
 
 //Config mongoose
 mongoose.Promise = global.Promise;
+//mongoose.set("useUnifiedTopology", true);
 mongoose
   .connect("mongodb://localhost/blogapp")
   .then(() => {

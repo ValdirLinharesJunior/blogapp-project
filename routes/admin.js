@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 
 //Chama o model de categorias para uso de forma externa
-const mongoose = require("mongoose");
 require("../models/Categoria");
 const Categoria = mongoose.model("categorias");
+require("../models/Postagem");
+const Postagem = mongoose.model("postagens");
 
 //Rota index
 router.get("/", (req, res) => {
@@ -122,12 +124,12 @@ router.post("/categorias/deletar", (req, res) => {
     });
 });
 
-//Rota para renderizar as postagens
+//Rota para renderizar as postagens****************************************************************************
 router.get("/postagens", (req, res) => {
   res.render("admin/postagens");
 });
 
-//Rota de adição de postagens
+//Carrega a lista de categorias na pagina de adição de postagens
 router.get("/postagens/addpostagem", (req, res) => {
   Categoria.find()
     .lean()
@@ -138,6 +140,40 @@ router.get("/postagens/addpostagem", (req, res) => {
       req.flash("error_msg", "Erro ao carregar o formulário...");
       res.redirect("/admin");
     });
+});
+
+//Rota nova postagem (salva no banco)
+router.post("/postagens/nova", (req, res) => {
+  //Fazer validação do form
+  var erros = [];
+
+  if (req.body.categoria == "0") {
+    erros.push({ texto: "Categoria invalida, registre uma categoria" });
+  }
+
+  if (erros.length > 0) {
+    res.render("admin/addpostagem", { erros: erros });
+  } else {
+    const novaPostagem = {
+      titulo: req.body.titulo,
+      slug: req.body.slug,
+      descricao: req.body.descricao,
+      conteudo: req.body.conteudo,
+      categoria: req.body.categoria,
+    };
+
+    //Adiciona no banco
+    new Postagem(novaPostagem)
+      .save()
+      .then(() => {
+        req.flash("success_msg", "Postagem criada com sucesso!");
+        res.redirect("/admin/postagens");
+      })
+      .catch((err) => {
+        req.flash("error_msg", "Erro ao salvar a postagem!");
+        res.redirect("/admin/postagens");
+      });
+  }
 });
 
 module.exports = router;
