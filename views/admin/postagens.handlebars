@@ -1,7 +1,34 @@
 <h2>Lista de postagens</h2>
 <hr />
-{{! Cria o botão para adicionar uma nova categoria }}
+{{! Cria o botão para adicionar uma nova postagem }}
 <a href="/admin/postagens/addpostagem">
   <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Nova postagem</button>
 </a>
 <hr />
+
+{{#each postagens}}
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h4>{{titulo}}</h4>
+      <p>Descrição: {{descricao}}</p>
+      <small>{{categoria.nome}}</small>
+      <br />
+      <small>Data: {{date}}</small>
+      <hr />
+      <div class="row pl-3">
+        {{! Botão para editar a postagem }}
+        <a href="/admin/postagens/edit/{{_id}}">
+          <button type="button" class="btn" style="background-color: #005293; color: #ffffff;">Editar postagem</button>
+        </a>
+        {{! Botão para deletar a postagem }}
+        <a href="/admin/postagens/deletar/{{_id}}">
+          <button type="button" class="btn ml-3" style="background-color: #005293; color: #ffffff;">Deletar postagem</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+{{else}}
+
+{{/each}}

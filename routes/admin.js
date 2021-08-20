@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-//Chama o model de categorias para uso de forma externa
+//Chama os models
 require("../models/Categoria");
 const Categoria = mongoose.model("categorias");
 require("../models/Postagem");
@@ -13,9 +13,9 @@ router.get("/", (req, res) => {
   res.render("admin/index");
 });
 
-//Rota categorias
+//Lista categorias na pagina de categorias
 router.get("/categorias", (req, res) => {
-  //Busca as categorias no banco para listar no front
+  //Busca as categorias no banco para listar
   Categoria.find()
     .lean()
     .sort({ data: "asc" })
@@ -28,12 +28,12 @@ router.get("/categorias", (req, res) => {
     });
 });
 
-//Rota add-categorias
+//Carrega a pagina de adição de categorias
 router.get("/categorias/addcategoria", (req, res) => {
   res.render("admin/addcategoria");
 });
 
-//Rota nova categoria (salva no banco)
+//Salva nova categoria no banco
 router.post("/categorias/nova", (req, res) => {
   //Fazer validação do form
   var erros = [];
@@ -53,7 +53,7 @@ router.post("/categorias/nova", (req, res) => {
   if (erros.length > 0) {
     res.render("admin/addcategoria", { erros: erros });
   } else {
-    //Captura os dados vindos do form e salva no banco
+    //Captura os dados vindos do form para salvar no banco
     const novaCategoria = {
       nome: req.body.nome,
       slug: req.body.slug,
@@ -73,7 +73,7 @@ router.post("/categorias/nova", (req, res) => {
   }
 });
 
-//Rota de edição de categorias (busca os dados da categoria que será editada)
+//Busca uma categoria para edição
 router.get("/categorias/edit/:id", (req, res) => {
   Categoria.findOne({ _id: req.params.id })
     .lean()
@@ -111,7 +111,7 @@ router.post("/categorias/edit", (req, res) => {
     });
 });
 
-//Deletar uma categoria
+//Deleta uma categoria
 router.post("/categorias/deletar", (req, res) => {
   Categoria.remove({ _id: req.body.id })
     .then(() => {
@@ -124,9 +124,19 @@ router.post("/categorias/deletar", (req, res) => {
     });
 });
 
-//Rota para renderizar as postagens****************************************************************************
+//Carrega a lista de postagens na pagina de postagens
 router.get("/postagens", (req, res) => {
-  res.render("admin/postagens");
+  Postagem.find()
+    .lean()
+    .populate("categoria")
+    .sort({ data: "desc" })
+    .then((postagens) => {
+      res.render("admin/postagens", { postagens: postagens });
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Houve um erro ao listar as postagens");
+      res.redirect("/admin");
+    });
 });
 
 //Carrega a lista de categorias na pagina de adição de postagens
@@ -142,7 +152,7 @@ router.get("/postagens/addpostagem", (req, res) => {
     });
 });
 
-//Rota nova postagem (salva no banco)
+//Adiciona nova postagem no bando
 router.post("/postagens/nova", (req, res) => {
   //Fazer validação do form
   var erros = [];
@@ -162,7 +172,7 @@ router.post("/postagens/nova", (req, res) => {
       categoria: req.body.categoria,
     };
 
-    //Adiciona no banco
+    //Salva no banco
     new Postagem(novaPostagem)
       .save()
       .then(() => {
@@ -174,6 +184,67 @@ router.post("/postagens/nova", (req, res) => {
         res.redirect("/admin/postagens");
       });
   }
+});
+
+//Carrega formulário para edição de postagem
+router.get("/postagens/edit/:id", (req, res) => {
+  Postagem.findOne({ _id: req.params.id })
+    .lean()
+    .then((postagem) => {
+      Categoria.find()
+        .lean()
+        .then((categorias) => {
+          res.render("admin/editpostagens", { categorias: categorias, postagem: postagem });
+        })
+        .catch((err) => {
+          req.flash("error_msg", "Houve um erro ao listar as categorias");
+          res.redirect("/admin/postagens");
+        });
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Houve um erro ao carregar o formulário");
+      res.redirect("/admin/postagens");
+    });
+});
+
+//Envia edição de postagem para o banco
+router.post("/postagens/edit", (req, res) => {
+  Postagem.findOne({ _id: req.body.id })
+    .then((postagem) => {
+      postagem.titulo = req.body.titulo;
+      postagem.slug = req.body.slug;
+      postagem.descricao = req.body.descricao;
+      postagem.conteudo = req.body.conteudo;
+      postagem.categoria = req.body.categoria;
+
+      postagem
+        .save()
+        .then(() => {
+          req.flash("success_msg", "Postagem editada com sucesso!");
+          res.redirect("/admin/postagens");
+        })
+        .catch((err) => {
+          req.flash("error_msg", "Erro interno");
+          res.redirect("/admin/postagens");
+        });
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Houve um erro ao salvar a edição");
+      res.redirect("/admin/postagens");
+    });
+});
+
+//Deleta postagem
+router.get("/postagens/deletar/:id", (req, res) => {
+  Postagem.remove({ _id: req.params.id })
+    .then(() => {
+      req.flash("success_msg", "Postagem deletada com sucesso!");
+      res.redirect("/admin/postagens");
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Houve um erro interno");
+      res.redirect("/admin/postagens");
+    });
 });
 
 module.exports = router;
