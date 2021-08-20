@@ -6,6 +6,8 @@ const admin = require("./routes/admin");
 const path = require("path");
 const session = require("express-session");
 const flash = require("connect-flash");
+require("./models/Postagem");
+const Postagem = mongoose.model("postagens");
 const app = express();
 
 //Config sessao
@@ -48,7 +50,27 @@ mongoose
 //Public (passa o path da pasta com o css e javascript)
 app.use(express.static(path.join(__dirname, "public")));
 
-//Rotas
+//Rota principal, carrega as postagens na home
+app.get("/", (req, res) => {
+  Postagem.find()
+    .lean()
+    .populate("categoria")
+    .sort({ data: "desc" })
+    .then((postagens) => {
+      res.render("index", { postagens: postagens });
+    })
+    .catch((err) => {
+      req.flash("error_msg", "Houve um erro interno");
+      res.redirect("/404");
+    });
+});
+
+//Rota de erro, carrega a pagina de erro
+app.get("/404", (req, res) => {
+  res.send("Erro 404!");
+});
+
+//Rota de administrador, carrega as paginas de gerenciamento do blog
 app.use("/admin", admin);
 
 //Inicia o servidor na porta 3000
