@@ -1,0 +1,28 @@
+{
+  "name": "blogapp",
+  "version": "1.0.0",
+  "description": "Estudo de node.js, desenvolvendo um blog.",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "express-session": "^1.17.2",
+    "mongoose": "^5.13.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ValdirLinharesJunior/blogapp-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ValdirLinharesJunior/blogapp-project/issues"
+  },
+  "homepage": "https://github.com/ValdirLinharesJunior/blogapp-project#readme"
+}
