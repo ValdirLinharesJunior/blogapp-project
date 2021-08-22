@@ -10,6 +10,7 @@ require("./models/Postagem");
 const Postagem = mongoose.model("postagens");
 require("./models/Categoria");
 const Categoria = mongoose.model("categorias");
+const usuario = require("./routes/usuario");
 const app = express();
 
 //Config sessao
@@ -129,8 +130,9 @@ app.get("/404", (req, res) => {
   res.send("Erro 404!");
 });
 
-//Rota de administrador, carrega as paginas de gerenciamento do blog
+//Chama as rotas de admin e usuario
 app.use("/admin", admin);
+app.use("/usuario", usuario);
 
 //Inicia o servidor na porta 3000
 const PORT = 3000;
