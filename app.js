@@ -11,6 +11,8 @@ const Postagem = mongoose.model("postagens");
 require("./models/Categoria");
 const Categoria = mongoose.model("categorias");
 const usuario = require("./routes/usuario");
+const passport = require("passport");
+require("./config/auth")(passport);
 const app = express();
 
 //Config sessao
@@ -21,12 +23,18 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Flash, para retorno e menssagens de alerta
 app.use(flash());
 
 //Middleware, configuração de variaveis globais para mensagem de sucesso e erro
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
+  res.locals.error = req.flash("error");
+  res.locals.user = req.user || null;
   next();
 });
 

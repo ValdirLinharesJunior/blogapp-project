@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 require("../models/Usuario");
 const Usuario = mongoose.model("usuarios");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
 
 //Rota para o form de cadastro de usuário
 router.get("/registro", function (req, res) {
@@ -88,6 +89,21 @@ router.post("/registro", function (req, res) {
 //Rota de login de usuario
 router.get("/login", function (req, res) {
   res.render("usuarios/login");
+});
+
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/usuario/login",
+    failureFlash: true,
+  })(req, res, next);
+});
+
+//Rota de logout
+router.get("/logout", (req, res) => {
+  req.logOut();
+  req.flash("success_msg", "Deslogado com sucesso!");
+  res.redirect("/");
 });
 
 module.exports = router;

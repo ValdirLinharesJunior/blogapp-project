@@ -7,14 +7,16 @@ require("../models/Categoria");
 const Categoria = mongoose.model("categorias");
 require("../models/Postagem");
 const Postagem = mongoose.model("postagens");
+//Pega os dados para validar se o usuario é admin
+const { eAdmin } = require("../helpers/eAdmin");
 
 //Rota index
-router.get("/", (req, res) => {
+router.get("/", eAdmin, (req, res) => {
   res.render("admin/index");
 });
 
-//Lista categorias na pagina de categorias
-router.get("/categorias", (req, res) => {
+//Lista categorias na pagina de categorias somente se o usuario for admin
+router.get("/categorias", eAdmin, (req, res) => {
   //Busca as categorias no banco para listar
   Categoria.find()
     .lean()
@@ -29,12 +31,12 @@ router.get("/categorias", (req, res) => {
 });
 
 //Carrega a pagina de adição de categorias
-router.get("/categorias/addcategoria", (req, res) => {
+router.get("/categorias/addcategoria", eAdmin, (req, res) => {
   res.render("admin/addcategoria");
 });
 
 //Salva nova categoria no banco
-router.post("/categorias/nova", (req, res) => {
+router.post("/categorias/nova", eAdmin, (req, res) => {
   //Fazer validação do form
   var erros = [];
 
@@ -74,7 +76,7 @@ router.post("/categorias/nova", (req, res) => {
 });
 
 //Busca uma categoria para edição
-router.get("/categorias/edit/:id", (req, res) => {
+router.get("/categorias/edit/:id", eAdmin, (req, res) => {
   Categoria.findOne({ _id: req.params.id })
     .lean()
     .then((categoria) => {
@@ -87,7 +89,7 @@ router.get("/categorias/edit/:id", (req, res) => {
 });
 
 //Envia a edição para o banco
-router.post("/categorias/edit", (req, res) => {
+router.post("/categorias/edit", eAdmin, (req, res) => {
   Categoria.findOne({ _id: req.body.id })
     .then((categoria) => {
       //Captura os dados para edição
@@ -112,7 +114,7 @@ router.post("/categorias/edit", (req, res) => {
 });
 
 //Deleta uma categoria
-router.post("/categorias/deletar", (req, res) => {
+router.post("/categorias/deletar", eAdmin, (req, res) => {
   Categoria.remove({ _id: req.body.id })
     .then(() => {
       req.flash("success_msg", "Categoria deletada com sucesso!");
@@ -125,7 +127,7 @@ router.post("/categorias/deletar", (req, res) => {
 });
 
 //Carrega a lista de postagens na pagina de postagens
-router.get("/postagens", (req, res) => {
+router.get("/postagens", eAdmin, (req, res) => {
   Postagem.find()
     .lean()
     .populate("categoria")
@@ -140,7 +142,7 @@ router.get("/postagens", (req, res) => {
 });
 
 //Carrega a lista de categorias na pagina de adição de postagens
-router.get("/postagens/addpostagem", (req, res) => {
+router.get("/postagens/addpostagem", eAdmin, (req, res) => {
   Categoria.find()
     .lean()
     .then((categorias) => {
@@ -153,7 +155,7 @@ router.get("/postagens/addpostagem", (req, res) => {
 });
 
 //Adiciona nova postagem no bando
-router.post("/postagens/nova", (req, res) => {
+router.post("/postagens/nova", eAdmin, (req, res) => {
   //Fazer validação do form
   var erros = [];
 
@@ -187,7 +189,7 @@ router.post("/postagens/nova", (req, res) => {
 });
 
 //Carrega formulário para edição de postagem
-router.get("/postagens/edit/:id", (req, res) => {
+router.get("/postagens/edit/:id", eAdmin, (req, res) => {
   Postagem.findOne({ _id: req.params.id })
     .lean()
     .then((postagem) => {
@@ -208,7 +210,7 @@ router.get("/postagens/edit/:id", (req, res) => {
 });
 
 //Envia edição de postagem para o banco
-router.post("/postagens/edit", (req, res) => {
+router.post("/postagens/edit", eAdmin, (req, res) => {
   Postagem.findOne({ _id: req.body.id })
     .then((postagem) => {
       postagem.titulo = req.body.titulo;
@@ -235,7 +237,7 @@ router.post("/postagens/edit", (req, res) => {
 });
 
 //Deleta postagem
-router.get("/postagens/deletar/:id", (req, res) => {
+router.get("/postagens/deletar/:id", eAdmin, (req, res) => {
   Postagem.remove({ _id: req.params.id })
     .then(() => {
       req.flash("success_msg", "Postagem deletada com sucesso!");
