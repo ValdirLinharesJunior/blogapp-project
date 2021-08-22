@@ -8,6 +8,8 @@ const session = require("express-session");
 const flash = require("connect-flash");
 require("./models/Postagem");
 const Postagem = mongoose.model("postagens");
+require("./models/Categoria");
+const Categoria = mongoose.model("categorias");
 const app = express();
 
 //Config sessao
@@ -37,9 +39,9 @@ app.set("view engine", "handlebars");
 
 //Config mongoose
 mongoose.Promise = global.Promise;
-//mongoose.set("useUnifiedTopology", true);
+mongoose.set("useUnifiedTopology", true);
 mongoose
-  .connect("mongodb://localhost/blogapp")
+  .connect("mongodb://localhost/blogapp", { useNewUrlParser: true })
   .then(() => {
     console.log("Conectado ao mongo...");
   })
@@ -62,6 +64,63 @@ app.get("/", (req, res) => {
     .catch((err) => {
       req.flash("error_msg", "Houve um erro interno");
       res.redirect("/404");
+    });
+});
+
+//Rota para a pagina de leitura da postagem
+app.get("/postagem/:slug", (req, res) => {
+  Postagem.findOne({ slug: req.params.slug })
+    .lean()
+    .then((postagem) => {
+      if (postagem) {
+        res.render("postagem/index", { postagem: postagem });
+      } else {
+        req.flash("error_msg", "Está postagem não existe");
+        res.redirect("/");
+      }
+    })
+    .catch(function (err) {
+      req.flash("error_msg", "Houve um erro interno");
+      res.redirect("/");
+    });
+});
+
+//Listagem de categorias
+app.get("/categorias", function (req, res) {
+  Categoria.find()
+    .lean()
+    .then(function (categorias) {
+      res.render("categorias/index", { categorias: categorias });
+    })
+    .catch(function (err) {
+      req.flash("error_msg", "Houve um erro interno ao listar as categorias");
+      res.redirect("/");
+    });
+});
+
+//Lista apenas os posts da categoria selecionada
+app.get("/categorias/:slug", function (req, res) {
+  Categoria.findOne({ slug: req.params.slug })
+    .lean()
+    .then(function (categoria) {
+      if (categoria) {
+        Postagem.find({ categoria: categoria._id })
+          .lean()
+          .then((postagens) => {
+            res.render("categorias/postagens", { postagens: postagens, categoria: categoria });
+          })
+          .catch((err) => {
+            req.flash("error_msg", "Houve um erro ao listar os posts");
+            res.redirect("/");
+          });
+      } else {
+        req.flash("error_msg", "Está categoria não existe");
+        res.redirect("/");
+      }
+    })
+    .catch(function (err) {
+      req.flash("error_msg", "Houve um erro interno ao carregar a pagina de categoria");
+      res.redirect("/");
     });
 });
 
