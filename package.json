@@ -1,5 +1,5 @@
 {
-  "name": "blogapp",
+  "name": "blogapp-node",
   "version": "1.0.0",
   "description": "Estudo de node.js, desenvolvendo um blog.",
   "main": "app.js",
